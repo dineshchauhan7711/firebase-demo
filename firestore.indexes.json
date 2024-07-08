@@ -1,0 +1,21 @@
+{
+  "indexes": [
+       {
+            "collectionGroup": "containers",
+            "queryScope": "COLLECTION",
+            "fields": [
+                 { "fieldPath": "sidebar_id", "order": "ASCENDING" },
+                 { "fieldPath": "created_at", "order": "ASCENDING" }
+            ]
+       },
+       {
+            "collectionGroup": "images",
+            "queryScope": "COLLECTION",
+            "fields": [
+                 { "fieldPath": "container_id", "order": "ASCENDING" },
+                 { "fieldPath": "created_at", "order": "ASCENDING" }
+            ]
+       }
+  ],
+       "fieldOverrides": []
+}
