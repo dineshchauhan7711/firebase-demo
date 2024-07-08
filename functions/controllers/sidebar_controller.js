@@ -46,7 +46,10 @@ const AddSidebar = async (req, res) => {
 const GetSidebarList = async (req, res) => {
      try {
           // Fetch all documents from the "sidebar_lists" collection
-          const querySnapshot = await Sidebar.orderBy("created_at", "asc").get();
+          const querySnapshot = await Sidebar
+               .orderBy("created_at", "asc")
+               .select("title")
+               .get();
 
           const responseData = querySnapshot.docs.map(doc => ({
                id: doc.id,

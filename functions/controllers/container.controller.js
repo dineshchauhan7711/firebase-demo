@@ -75,7 +75,7 @@ const GetContainers = async (req, res) => {
           const containerSnapshot = await Container
                .where("sidebar_id", "==", sidebar_id)
                .orderBy("created_at", "asc")
-               .select("name", "description", "created_at")
+               .select("name", "description")
                .get();
 
           if (containerSnapshot.empty) {
@@ -94,7 +94,7 @@ const GetContainers = async (req, res) => {
                const imagesSnapshot = await Images
                     .where("container_id", "==", containerDoc.id)
                     .orderBy("created_at", "asc")
-                    .select("name", "url", "created_at")
+                    .select("name", "url")
                     .get();
 
                // Add image data to containerData
