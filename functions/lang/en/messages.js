@@ -28,6 +28,15 @@ const MESSAGES = {
     '3008': 'Image not found, please select valid',
     '3009': 'Get image successfully',
 
+    // Playlist
+    '4001': 'Playlist added successfully',
+    '4002': 'Get playlist successfully',
+    '4003': 'Playlist deleted successfully',
+    '4004': 'Playlist not found, please select valid',
+    '4005': 'Image added to playlist successfully',
+    '4006': 'Image removed from playlist successfully',
+    '4007': 'Image already added to playlist.',
+
     // Common
     '9000': 'Please Enter Valid data!',
     '9001': 'Not found',

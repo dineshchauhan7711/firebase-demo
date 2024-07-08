@@ -1,6 +1,7 @@
+// Modules
 const admin = require('firebase-admin');
-const { Storage } = require('@google-cloud/storage');
 
+// Files/Helpers
 const serviceAccount = require("../../serviceAccountKey.json");
 const config = require('./config');
 
@@ -11,7 +12,6 @@ admin.initializeApp({
 
 
 const db = admin.firestore();
-// const bucket = admin.storage().bucket();
 
 module.exports = { db, admin };
 

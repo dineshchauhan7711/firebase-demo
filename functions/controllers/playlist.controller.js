@@ -9,40 +9,40 @@ const Images = db.collection("images");
 
 
 /**
- * Add Container
+ * Add Image To Playlist
  **/
-const AddContainer = async (req, res) => {
+const AddImageToPlaylist = async (req, res) => {
      try {
           const validation = new validator(req.body, {
-               name: 'required|string|uppercase',
-               sidebar_id: 'required|string',
+               image_id: 'required|string',
           });
           if (validation.fails()) {
                const firstMessage = Object.keys(validation.errors.all())[0];
                return response.error(res, validation.errors.first(firstMessage));
           };
-          const { name, sidebar_id } = req.body;
+          const { image_id } = req.body;
 
-          // Check if the sidebar list exists
-          const sidebarSnapshot = await Sidebar.doc(sidebar_id).get();
-          if (!sidebarSnapshot.exists) {
-               return response.error(res, 2004);
+          // Check if the image exists
+          const imageSnapshot = await Images.doc(image_id).get();
+          if (!imageSnapshot.exists) {
+               return response.error(res, 3008);
           };
 
-          // Check if the title already exists
-          const snapshot = await Container.where("name", "==", name).get();
-          if (!snapshot.empty) {
-               return response.error(res, 3005);
+          // Check if image is already in playlist
+          const playlistSnapshot = await Playlist
+               .where("image_id", "==", image_id)
+               .get();
+          if (!playlistSnapshot.empty) {
+               return response.error(res, 4007);
           };
 
           // Add the sidebar list with created_at timestamp
-          await Container.add({
-               sidebar_id,
-               name,
+          await Playlist.add({
+               image_id,
                created_at: new Date(),
                updated_at: new Date()
           });
-          return response.success(res, 3001);
+          return response.success(res, 4005);
      } catch (error) {
           console.error('Error ===>> ', error);
           return response.error(res, 9999);
@@ -50,74 +50,46 @@ const AddContainer = async (req, res) => {
 };
 
 /**
- * Get Containers
- */
-const GetContainers = async (req, res) => {
+ * Get Playlists
+ **/
+const GetPlaylists = async (req, res) => {
      try {
-          const validation = new validator(req.query, {
-               sidebar_id: 'required|string',
-          });
-          if (validation.fails()) {
-               const firstMessage = Object.keys(validation.errors.all())[0];
-               return response.error(res, validation.errors.first(firstMessage));
-          };
-
-          const { sidebar_id } = req.query;
-
-          // Check if the sidebar list exists
-          const sidebarSnapshot = await Sidebar.doc(sidebar_id).get();
-          if (!sidebarSnapshot.exists) {
-               return response.error(res, 2004);
-          };
-
-          // Fetch containers with selected fields
-          const containerSnapshot = await Container
-               .where("sidebar_id", "==", sidebar_id)
+          // Fetch Playlists with selected fields
+          const playlistSnapshot = await Playlist
                .orderBy("created_at", "asc")
-               .select("name", "description", "created_at")
-               .get();
+               .select("image_id")
+               .get()
 
-          if (containerSnapshot.empty) {
-               return response.success(res, 3002, []);
+          if (playlistSnapshot.empty) {
+               return response.success(res, 4002, []);
           };
 
-          // Fetch images for each container in parallel
-          const containersData = await Promise.all(containerSnapshot.docs.map(async (containerDoc) => {
-               const containerData = {
-                    id: containerDoc.id,
-                    ...containerDoc.data(),
-                    images: []
-               };
+          // Fetch images for each playlist.
+          const playlistData = await Promise.all(playlistSnapshot.docs.map(
+               async (doc) => {
+                    const imageSnapshot = await Images
+                         .doc(doc.data().image_id)
+                         .get();
+                    return {
+                         id: doc.id,
+                         ...doc.data(),
+                         name: imageSnapshot.data().name || null,
+                         url: imageSnapshot.data().url || null
+                    };
+               }
+          ));
 
-               // Fetch images associated with the current container
-               const imagesSnapshot = await Images
-                    .where("container_id", "==", containerDoc.id)
-                    .orderBy("created_at", "asc")
-                    .select("name", "url", "created_at")
-                    .get();
-
-               // Add image data to containerData
-               containerData.images = imagesSnapshot.docs.map(imageDoc => ({
-                    id: imageDoc.id,
-                    ...imageDoc.data()
-               }));
-
-               return containerData;
-          }));
-
-          // Send successful response with containers and their images
-          return response.success(res, 3002, containersData);
+          // Send successful response.
+          return response.success(res, 4002, playlistData);
      } catch (error) {
           console.log('error =====>>> ', error);
           response.error(res, 9999);
      }
 };
 
-
-
 module.exports = {
-     AddContainer,
-     GetContainers
+     AddImageToPlaylist,
+     GetPlaylists
 }
 
 
